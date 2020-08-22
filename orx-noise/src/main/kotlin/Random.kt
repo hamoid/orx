@@ -74,6 +74,10 @@ object Random {
         return rnd.nextDouble(1.0) < probability
     }
 
+    fun sign(): Double {
+        return int0(2) * 2.0 - 1.0
+    }
+
     fun <T> pick(coll: Collection<T>): T {
         return pick(coll, count = 1).first()
     }
