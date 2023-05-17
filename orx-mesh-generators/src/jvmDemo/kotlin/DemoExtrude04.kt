@@ -6,16 +6,26 @@ import org.openrndr.draw.shadeStyle
 import org.openrndr.extra.camera.Orbital
 import org.openrndr.extra.meshgenerators.buildTriangleMesh
 import org.openrndr.extra.meshgenerators.extrudeContourSteps
-import org.openrndr.extra.noise.Random
 import org.openrndr.math.Vector3
-import org.openrndr.shape.Circle
-import org.openrndr.shape.Path3D
-import org.openrndr.shape.Segment3D
+import org.openrndr.shape.*
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.random.Random
 
-/**
- * Extruded Bézier tubes grown on a morphing Bézier surface.
- *
- */
+private fun ShapeContour.toPath3D() = Path3D(segments.map { seg ->
+    Segment3D(
+        seg.start.xy0,
+        seg.control.map { it.xy0 }.toTypedArray(),
+        seg.end.xy0
+    )
+}, closed)
+
+private fun r() = Vector3(
+    Random.nextDouble(-4.0, 4.0),
+    Random.nextDouble(-4.0, 4.0),
+    Random.nextDouble(-4.0, 4.0)
+)
+
 fun main() {
     application {
         configure {
@@ -24,7 +34,40 @@ fun main() {
             multisample = WindowMultisample.SampleCount(8)
         }
         program {
-            val crossSection = Circle(0.0, 0.0, 0.2).contour
+            val m = buildTriangleMesh {
+                color = ColorRGBa.PINK
+
+                val beziers = List(4) {
+                    Segment3D(r(), r(), r(), r())
+                }
+
+                translate(-1.0, 0.0, 0.0)
+
+                val crossSection = Circle(0.0, 0.0, 0.2).contour
+
+                for (i in 0 until 20) {
+                    val t = i / (20.0 - 1.0)
+                    val path = Path3D(
+                        listOf(
+                            Segment3D(
+                                beziers[0].position(t),
+                                beziers[1].position(t),
+                                beziers[2].position(t),
+                                beziers[3].position(t)
+                            )
+                        ), false
+                    )
+                    extrudeContourSteps(
+                        crossSection,
+                        path,
+                        120,
+                        Vector3.UNIT_Y,
+                        contourDistanceTolerance = 0.02,
+                        pathDistanceTolerance = 0.001,
+                        // env = { t: Double -> 0.5 - 0.5 * cos(t * 2 * PI)  }
+                    )
+                }
+            }
 
             extend(Orbital()) {
                 this.eye = Vector3(0.0, 3.0, 7.0)
@@ -39,47 +82,7 @@ fun main() {
                     """.trimIndent()
                 }
 
-                val m = buildTriangleMesh {
-                    val beziers = List(4) { curveId ->
-                        val n = List(12) {
-                            Random.simplex(it * 7.387, curveId * 5.531 + seconds * 0.05) * 10.0
-                        }
-                        Segment3D(
-                            Vector3(n[0], n[1], n[2]),
-                            Vector3(n[3], n[4], n[5]),
-                            Vector3(n[6], n[7], n[8]),
-                            Vector3(n[9], n[10], n[11])
-                        )
-                    }
-
-                    for (i in 0 until 20) {
-                        val t = i / (20.0 - 1.0)
-                        val path = Path3D(
-                            listOf(
-                                Segment3D(
-                                    beziers[0].position(t),
-                                    beziers[1].position(t),
-                                    beziers[2].position(t),
-                                    beziers[3].position(t)
-                                )
-                            ), false
-                        )
-                        color = if(i % 2 == 0) ColorRGBa.PINK else ColorRGBa.WHITE.shade(0.1)
-                        extrudeContourSteps(
-                            crossSection,
-                            path,
-                            120,
-                            Vector3.UNIT_Y,
-                            contourDistanceTolerance = 0.05,
-                            pathDistanceTolerance = 0.05
-                        )
-                    }
-                }
-
                 drawer.vertexBuffer(m, DrawPrimitive.TRIANGLES)
-
-                // Remember to free the memory! Otherwise, the computer will quickly run out of RAM.
-                m.destroy()
             }
         }
     }

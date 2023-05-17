@@ -103,9 +103,9 @@ fun contourSegment(
  */
 fun triangulationWithFrame(
     triangulation: List<Triangle>,
-    frame: Matrix44,
+    frame:Matrix44,
     flipNormals: Boolean = true,
-    writer: VertexWriter
+    writer:VertexWriter
 ) {
     val normalFrame = normalMatrix(frame)
     val normalScale = if (!flipNormals) -1.0 else 1.0
@@ -150,6 +150,7 @@ fun extrudeContourSteps(
     frames: List<Matrix44> = steps.frames(up0),
     startCap: Boolean = true,
     endCap: Boolean = true,
+    env: (Double) -> Double = { _ -> 1.0},
     writer: VertexWriter
 ) {
     val linearContour = contour.sampleLinear(contourDistanceTolerance)
@@ -158,10 +159,14 @@ fun extrudeContourSteps(
 
     // First add caps
     extrudeCaps(linearContour.shape, path, startCap, endCap, frames, writer)
+    val crossSections = List(finalFrames.size) {
+        val t = it / (finalFrames.size - 1.0)
+        linearContourPoints.map { p -> p * env(t) }
+    }
 
     // Then add sides
-    finalFrames.windowed(2, 1).forEach {
-        contourSegment(linearContourPoints, it[0], it[1], writer)
+    (finalFrames zip crossSections).windowed(2, 1).forEach {
+        contourSegment(it[0].second, it[1].second, it[0].first, it[1].first, writer)
     }
 }
 
@@ -267,6 +272,7 @@ fun extrudeShapeSteps(
     frames: List<Matrix44> = steps.frames(up0),
     startCap: Boolean,
     endCap: Boolean,
+    env: (Double) -> Double = { _ -> 1.0},
     writer: VertexWriter
 ) {
     val linearShape = Shape(shape.contours.map { it.contour.sampleLinear(contourDistanceTolerance) })
@@ -287,7 +293,8 @@ fun extrudeShapeSteps(
             frames,
             startCap = false,
             endCap = false,
-            writer
+            env = env,
+            writer = writer
         )
     }
 }
@@ -431,13 +438,17 @@ fun TriangleMeshBuilder.extrudeContourSteps(
     up0: Vector3,
     contourDistanceTolerance: Double = 0.5,
     pathDistanceTolerance: Double = 0.5,
+    env: (Double) -> Double = { _ -> 1.0}
 ) = extrudeContourSteps(
     contour,
     path,
     stepCount,
     up0,
+    startCap = false,
+    endCap = false,
     contourDistanceTolerance,
     pathDistanceTolerance,
+    env = env,
     writer = this::write
 )
 
