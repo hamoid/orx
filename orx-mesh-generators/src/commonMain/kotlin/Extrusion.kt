@@ -166,6 +166,59 @@ fun extrudeContourSteps(
 }
 
 /**
+ * Extrude a [contour] along a [path] specifying the number of steps.
+ *
+ * @param contour the cross-section of the mesh
+ * @param path the 3D path
+ * @param stepCount the number of steps along the [path]
+ * @param up0 the initial up-vector
+ * @param contourDistanceTolerance precision for calculating steps along
+ * [contour]. Lower tolerance results in higher precision.
+ * @param pathDistanceTolerance precision for calculating steps along
+ * [path]. Lower tolerance results in higher precision.
+ * @param steps the resulting positions in the path
+ * @param frames a list of matrices holding the transformation matrices along
+ * the path
+ * @param startCap adds a start cap if set to true
+ * @param endCap adds an end cap if set to true
+ * @param env A function that converts `t` into a radius
+ * @param writer the vertex writer function
+ */
+fun extrudeContourStepsVar(
+    contour: ShapeContour,
+    path: Path3D,
+    stepCount: Int,
+    up0: Vector3,
+    contourDistanceTolerance: Double = 0.5,
+    pathDistanceTolerance: Double = 0.5,
+    steps: List<Vector3> = path.equidistantPositions(
+        stepCount,
+        pathDistanceTolerance
+    ),
+    frames: List<Matrix44> = steps.frames(up0),
+    startCap: Boolean = true,
+    endCap: Boolean = true,
+    env: (Double) -> Double = { _ -> 1.0},
+    writer: VertexWriter
+) {
+    val linearContour = contour.sampleLinear(contourDistanceTolerance)
+    val linearContourPoints = linearContour.adaptivePositions().map { it.xy0 }
+    val finalFrames = if (path.closed) frames + frames.first() else frames
+
+    // First add caps
+    extrudeCaps(linearContour.shape, path, startCap, endCap, frames, writer)
+    val crossSections = List(finalFrames.size) {
+        val t = it / (finalFrames.size - 1.0)
+        linearContourPoints.map { p -> p * env(t) }
+    }
+
+    // Then add sides
+    (finalFrames zip crossSections).windowed(2, 1).forEach {
+        contourSegment(it[0].second, it[1].second, it[0].first, it[1].first, writer)
+    }
+}
+
+/**
  * Adds caps to an extruded shape
  *
  * @param linearShape the cross-section of the mesh
@@ -288,6 +341,64 @@ fun extrudeShapeSteps(
             startCap = false,
             endCap = false,
             writer
+        )
+    }
+}
+
+
+/**
+ * Extrude a [shape] along a [path] specifying the number of steps.
+ *
+ * @param shape the cross-section of the mesh
+ * @param path the 3D path
+ * @param stepCount the number of steps along the [path]
+ * @param up0 the initial up-vector
+ * @param contourDistanceTolerance precision for calculating steps along
+ * [shape]. Lower tolerance results in higher precision.
+ * @param pathDistanceTolerance precision for calculating steps along
+ * [path]. Lower tolerance results in higher precision.
+ * @param steps the resulting positions in the path
+ * @param frames a list of matrices holding the transformation matrices along
+ * the path
+ * @param startCap adds a start cap if set to true
+ * @param endCap adds an end cap if set to true
+ * @param env A function that converts `t` into a radius
+ * @param writer the vertex writer function
+ */
+fun extrudeShapeStepsVar(
+    shape: Shape,
+    path: Path3D,
+    stepCount: Int,
+    up0: Vector3,
+    contourDistanceTolerance: Double = 0.5,
+    pathDistanceTolerance: Double = 0.5,
+    steps: List<Vector3> = path.equidistantPositions(stepCount, pathDistanceTolerance),
+    frames: List<Matrix44> = steps.frames(up0),
+    startCap: Boolean,
+    endCap: Boolean,
+    env: (Double) -> Double = { _ -> 1.0},
+    writer: VertexWriter
+) {
+    val linearShape = Shape(shape.contours.map { it.contour.sampleLinear(contourDistanceTolerance) })
+
+    // First add caps
+    extrudeCaps(linearShape, path, startCap, endCap, frames, writer)
+
+    // Then add sides
+    for (contour in linearShape.contours) {
+        extrudeContourStepsVar(
+            contour,
+            path,
+            stepCount,
+            up0,
+            contourDistanceTolerance,
+            pathDistanceTolerance,
+            steps,
+            frames,
+            startCap = false,
+            endCap = false,
+            env = env,
+            writer = writer
         )
     }
 }
@@ -438,6 +549,40 @@ fun TriangleMeshBuilder.extrudeContourSteps(
     up0,
     contourDistanceTolerance,
     pathDistanceTolerance,
+    writer = this::write
+)
+
+/**
+ * Extrude a [contour] along a [path] specifying the number of steps.
+ *
+ * @param contour the cross-section of the mesh
+ * @param path the 3D path
+ * @param stepCount the number of steps along the [path]
+ * @param up0 the initial up-vector
+ * @param contourDistanceTolerance precision for calculating steps along
+ * [contour]. Lower tolerance results in higher precision.
+ * @param pathDistanceTolerance precision for calculating steps along
+ * @param env A function that converts `t` into a radius
+ * [path]. Lower tolerance results in higher precision.
+ */
+fun TriangleMeshBuilder.extrudeContourStepsVar(
+    contour: ShapeContour,
+    path: Path3D,
+    stepCount: Int,
+    up0: Vector3,
+    contourDistanceTolerance: Double = 0.5,
+    pathDistanceTolerance: Double = 0.5,
+    env: (Double) -> Double = { _ -> 1.0}
+) = extrudeContourStepsVar(
+    contour,
+    path,
+    stepCount,
+    up0,
+    startCap = false,
+    endCap = false,
+    contourDistanceTolerance = contourDistanceTolerance,
+    pathDistanceTolerance = pathDistanceTolerance,
+    env = env,
     writer = this::write
 )
 
