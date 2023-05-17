@@ -9,3 +9,4 @@ gradle.properties
 /hs_err_pid*.log
 /gui-parameters/
 /ShaderError.glsl
+**/images/
