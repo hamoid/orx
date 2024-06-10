@@ -1,0 +1,18 @@
+
+private fun ShapeContour.toPath3D() = Path3D(segments.map { seg ->
+    Segment3D(
+        seg.start.xy0,
+        seg.control.map { it.xy0 }.toTypedArray(),
+        seg.end.xy0
+    )
+}, closed)
+
+                        extrudeContourSteps(
+                            crossSection,
+                            path,
+                            120,
+                            Vector3.UNIT_Y,
+                            contourDistanceTolerance = 0.05,
+                            pathDistanceTolerance = 0.05,
+                            // env = { t: Double -> 0.5 - 0.5 * cos(t * 2 * PI)  }
+                        )

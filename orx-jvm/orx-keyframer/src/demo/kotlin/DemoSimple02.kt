@@ -2,6 +2,7 @@ import org.openrndr.application
 import org.openrndr.extensions.SingleScreenshot
 import org.openrndr.extra.keyframer.Keyframer
 import org.openrndr.resourceUrl
+import java.net.URI
 import java.net.URL
 
 fun main() = application {
@@ -12,7 +13,7 @@ fun main() = application {
             val color by RGBChannel(arrayOf("r", "g", "b"))
         }
         val animation = Animation()
-        animation.loadFromJson(URL(resourceUrl("/demo-simple-02.json")))
+        animation.loadFromJson(URI(resourceUrl("/demo-simple-02.json")).toURL())
         if (System.getProperty("takeScreenshot") == "true") {
             extend(SingleScreenshot()) {
                 this.outputFile = System.getProperty("screenshotPath")

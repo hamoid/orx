@@ -6,7 +6,7 @@ import org.openrndr.panel.elements.Range
 import org.openrndr.panel.elements.Slider
 import org.openrndr.panel.elements.slider
 import org.openrndr.resourceUrl
-import java.net.URL
+import java.net.URI
 
 fun main() = application {
     program {
@@ -40,7 +40,7 @@ fun main() = application {
             val position by Vector2Channel(arrayOf("x", "y"))
         }
         val animation = Animation()
-        animation.loadFromJson(URL(resourceUrl("/demo-simple-01.json")))
+        animation.loadFromJson(URI(resourceUrl("/demo-simple-01.json")).toURL())
 
         extend {
             // -- update the slider

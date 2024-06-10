@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.nebula.release)
     alias(libs.plugins.gradle.nexus.publish)
+    alias(libs.plugins.versions)
     id("org.openrndr.extra.convention.dokka")
 }
 
@@ -98,6 +99,20 @@ nexusPublishing {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots"))
         }
+    }
+}
+
+tasks.named("dependencyUpdates").configure {
+    gradleReleaseChannel = "current"
+
+    def nonStableKeywords = ["alpha", "beta", "rc"]
+
+    def isNonStable = { String version ->
+        return nonStableKeywords.any { version.toLowerCase().contains(it) }
+    }
+
+    rejectVersionIf {
+        isNonStable(it.candidate.version) &&!isNonStable(it.currentVersion)
     }
 }
 

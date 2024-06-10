@@ -36,37 +36,37 @@ fun main() {
                     gsUrl = resourceUrl("/shaders/ts-04.geom"),
                     fsUrl = resourceUrl("/shaders/ts-04.frag")
             )
-
-            val mesh = sphereMesh()
+//
+//            val mesh = sphereMesh()
             extend {
-                val vc = vb.put {
-                    for (segment in path.sub(0.0, cos(seconds*0.1)*0.5+ 0.5).segments) {
-                        val cubic = segment.cubic
-                        write(cubic.start)
-                        write(cubic.control[0])
-                        write(cubic.control[1])
-                        write(cubic.end)
-                    }
-                }
-                drawer.clear(ColorRGBa.PINK)
-                drawer.depthTestPass = DepthTestPass.LESS_OR_EQUAL
-                drawer.depthWrite = true
-                drawer.vertexBuffer(mesh, DrawPrimitive.TRIANGLES)
+//                val vc = vb.put {
+//                    for (segment in path.sub(0.0, cos(seconds*0.1)*0.5+ 0.5).segments) {
+//                        val cubic = segment.cubic
+//                        write(cubic.start)
+//                        write(cubic.control[0])
+//                        write(cubic.control[1])
+//                        write(cubic.end)
+//                    }
+//                }
+                //drawer.clear(ColorRGBa.PINK)
+//                drawer.depthTestPass = DepthTestPass.LESS_OR_EQUAL
+//                drawer.depthWrite = true
+                //drawer.vertexBuffer(mesh, DrawPrimitive.TRIANGLES)
 
-                shader.begin()
-                shader.uniform("offset", mouse.position.xy0)
-                shader.uniform("view", drawer.view)
-                shader.uniform("proj", drawer.projection)
-                shader.uniform("model", drawer.model)
-                shader.uniform("resolution", 32)
-                shader.uniform("weight", 3.0 + cos(seconds))
-                shader.uniform("time", seconds*0.0)
-                drawer.depthWrite = false
+//                shader.begin()
+//                shader.uniform("offset", mouse.position.xy0)
+//                shader.uniform("view", drawer.view)
+//                shader.uniform("proj", drawer.projection)
+//                shader.uniform("model", drawer.model)
+//                shader.uniform("resolution", 32)
+//                shader.uniform("weight", 3.0 + cos(seconds))
+//                shader.uniform("time", seconds*0.0)
+//                drawer.depthWrite = false
 
-                driver.setState(drawer.drawStyle)
-                driver.drawVertexBuffer(shader, listOf(vb), DrawPrimitive.PATCHES, 0, vc)
-                shader.end()
-                drawer.fill = ColorRGBa.WHITE
+                //driver.setState(drawer.drawStyle)
+                //driver.drawVertexBuffer(shader, listOf(vb), DrawPrimitive.PATCHES, 0, vc)
+//                shader.end()
+//                drawer.fill = ColorRGBa.WHITE
             }
         }
     }

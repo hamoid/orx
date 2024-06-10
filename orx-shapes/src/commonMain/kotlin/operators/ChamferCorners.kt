@@ -65,7 +65,7 @@ fun ShapeContour.chamferCorners(
                 moveTo(position(0.0))
             }
             if (it.linear) {
-                if (!this@chamferCorners.closed)
+                //if (!this@chamferCorners.closed)
                     moveTo(position(0.0))
             }
         }

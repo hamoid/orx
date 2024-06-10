@@ -5,7 +5,13 @@ target/
 build/
 *.iml/
 .idea/
+.lwjgl/
 gradle.properties
 /hs_err_pid*.log
 /gui-parameters/
 /ShaderError.glsl
+**/images/*.png
+screenshots/
+/changes.txt
+/latest
+/.kotlin

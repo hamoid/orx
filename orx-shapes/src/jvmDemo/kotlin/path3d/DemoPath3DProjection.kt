@@ -4,25 +4,20 @@ import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.LineJoin
 import org.openrndr.extra.camera.Orbital
-import org.openrndr.extra.noise.uniformRing
 import org.openrndr.extra.shapes.path3d.projectToContour
+import org.openrndr.math.Spherical
 import org.openrndr.math.Vector3
 import org.openrndr.shape.path3D
 
 fun main() {
     application {
-        configure {
-            width = 720
-            height = 720
-        }
         program {
             val path = path3D {
-                var p = Vector3(1.0, 0.0, 0.0)
-                moveTo(p * 6.0)
-                for (i in 0 until 400) {
-                    p += Vector3.uniformRing(0.2, 0.5)
-                    p = p.normalized
-                    arcTo(5.0, cursor.atan2(p * 6.0), false, false, p * 6.0)
+                var p = Vector3(6.0, 0.0, 0.0)
+                moveTo(p)
+                for (i in 0 until 100) {
+                    p = Spherical((i % 6) * 45.0, (i % 4 + 1) * 30.0 + i * 0.1, 6.0).cartesian
+                    arcTo(5.0, cursor.atan2(p), false, false, p)
                 }
             }
             extend(Orbital())

@@ -69,7 +69,21 @@ kotlin {
     }
 
     js(IR) {
-        browser()
+        browser {
+            testTask {
+                useKarma {
+                    //useIe()
+                    //useSafari()
+                    //useFirefox()
+                    //useChrome()
+                    //useChromeCanary()
+                    //useChromeHeadless()
+                    useChromium()
+                    //usePhantomJS()
+                    //useOpera()
+                }
+            }
+        }
         nodejs()
     }
 

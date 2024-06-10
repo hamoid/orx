@@ -5,7 +5,6 @@ import org.openrndr.draw.Shader
 import org.openrndr.extra.camera.Orbital
 import org.openrndr.extra.meshgenerators.boxMesh
 import org.openrndr.resourceText
-import org.openrndr.resourceUrl
 
 fun main() {
     application {
@@ -21,11 +20,13 @@ fun main() {
             extend {
                 drawer.clear(ColorRGBa.PINK)
                 shader.begin()
-                shader.uniform("offset", mouse.position.xy0)
+                shader.uniform("offset", mouse.position.xy0 * 0.001)
                 shader.uniform("view", drawer.view)
                 shader.uniform("proj", drawer.projection)
                 shader.uniform("model", drawer.model)
-                driver.drawVertexBuffer(shader, listOf(vb), DrawPrimitive.TRIANGLES, 0, vb.vertexCount)
+                driver.drawVertexBuffer(
+                    shader, listOf(vb), DrawPrimitive.TRIANGLES, 0, vb.vertexCount
+                )
                 shader.end()
             }
         }

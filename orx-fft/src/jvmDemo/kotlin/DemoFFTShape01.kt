@@ -1,16 +1,15 @@
 import org.openrndr.application
-
 import org.openrndr.color.ColorRGBa
 import org.openrndr.extra.fft.FFT
 import org.openrndr.extra.noise.scatter
 import org.openrndr.extra.shapes.hobbycurve.hobbyCurve
-import org.openrndr.math.Vector2
 import org.openrndr.extra.shapes.splines.catmullRom
 import org.openrndr.extra.shapes.splines.toContour
+import org.openrndr.math.Vector2
 import org.openrndr.math.smoothstep
 import org.openrndr.math.transforms.buildTransform
 import org.openrndr.shape.LineSegment
-import kotlin.math.*
+import kotlin.math.max
 import kotlin.random.Random
 
 /**
@@ -51,7 +50,9 @@ fun main() {
             }
 
             val c = hobbyCurve(
-                drawer.bounds.scatter(40.0, distanceToEdge = 100.0, random = Random(0)),
+                drawer.bounds.scatter(30.0, distanceToEdge = 100.0, random = Random(3)).filter {
+                    Random.nextBoolean()
+                },
                 true
             ).transform(buildTransform { translate(-drawer.bounds.center) })
 
@@ -80,8 +81,8 @@ fun main() {
 
                 val xpower = fft.magnitudeSum()
 
-                val lpc = mouse.position.x / width
-                val hpc = mouse.position.y / height
+                val hpc = mouse.position.x / width
+                val lpc = mouse.position.y / height
 
                 for (i in 1..fftSize / 2) {
                     val t = i.toDouble() / (fftSize / 2 - 1)
@@ -110,9 +111,9 @@ fun main() {
                 drawer.stroke = ColorRGBa.GRAY.shade(0.5)
                 drawer.lineSegments((0 until fft.size / 2).map {
                     LineSegment(
-                        it.toDouble() * 2.0 + 0.5,
+                        it * 2.0 + 0.5,
                         height * 0.5,
-                        it.toDouble() * 2.0 + 0.5,
+                        it * 2.0 + 0.5,
                         height * 0.5 + fft.magnitude(it) / 200.0,
                     )
                 })
@@ -130,9 +131,9 @@ fun main() {
                 drawer.stroke = ColorRGBa.PINK.opacify(0.7)
                 drawer.lineSegments((0 until fft.size / 2).map {
                     LineSegment(
-                        it.toDouble() * 2.0 + 0.5,
+                        it * 2.0 + 0.5,
                         height * 0.5,
-                        it.toDouble() * 2.0 + 0.5,
+                        it * 2.0 + 0.5,
                         height * 0.5 + fft.magnitude(it) / 200.0,
                     )
                 })

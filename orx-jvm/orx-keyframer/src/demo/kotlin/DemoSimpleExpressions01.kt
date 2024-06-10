@@ -2,7 +2,7 @@ import org.openrndr.application
 import org.openrndr.extensions.SingleScreenshot
 import org.openrndr.extra.keyframer.Keyframer
 import org.openrndr.resourceUrl
-import java.net.URL
+import java.net.URI
 
 fun main() = application {
     program {
@@ -12,7 +12,8 @@ fun main() = application {
         }
 
         val animation = Animation()
-        animation.loadFromJson(URL(resourceUrl("/demo-simple-expressions-01.json")),
+        animation.loadFromJson(
+            URI(resourceUrl("/demo-simple-expressions-01.json")).toURL(),
                 parameters = mapOf("cycleDuration" to 2.0))
         if (System.getProperty("takeScreenshot") == "true") {
             extend(SingleScreenshot()) {
