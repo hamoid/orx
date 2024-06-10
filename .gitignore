@@ -4,7 +4,6 @@ out/
 target/
 build/
 *.iml/
-.idea/
 .lwjgl/
 gradle.properties
 /hs_err_pid*.log
@@ -15,3 +14,4 @@ screenshots/
 /changes.txt
 /latest
 /.kotlin
+
