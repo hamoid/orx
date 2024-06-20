@@ -4,6 +4,9 @@ import org.openrndr.extra.color.colormaps.ColormapPhraseBook
 import org.openrndr.extra.shaderphrases.preprocess
 
 fun main() = application {
+    configure {
+        height = 150
+    }
     program {
         ColormapPhraseBook.register()
         val style = shadeStyle {

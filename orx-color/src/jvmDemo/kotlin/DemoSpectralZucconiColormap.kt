@@ -4,6 +4,9 @@ import org.openrndr.extra.noise.fastFloor
 import kotlin.math.sin
 
 fun main() = application {
+    configure {
+        height = 150
+    }
     program {
         extend {
             drawer.stroke = null

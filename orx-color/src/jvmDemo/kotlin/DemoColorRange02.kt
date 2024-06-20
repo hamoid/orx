@@ -6,6 +6,9 @@ import org.openrndr.extra.color.palettes.colorSequence
 import org.openrndr.extra.color.spaces.toHSLUVa
 
 fun main() = application {
+    configure {
+        height = 150
+    }
     program {
         extend {
             val cs = colorSequence(0.0 to ColorRGBa.PINK,

@@ -9,8 +9,8 @@ import kotlin.random.Random
 fun main() {
     application {
         configure {
-            width = 720
-            height = 720
+            width = 600
+            height = 600
         }
 
         program {
