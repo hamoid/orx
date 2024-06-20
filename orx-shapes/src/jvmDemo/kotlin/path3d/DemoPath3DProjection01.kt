@@ -30,6 +30,7 @@ fun main() {
                 drawer.stroke = ColorRGBa.PINK
                 drawer.path(path)
                 val c = path.projectToContour(drawer.projection, drawer.view, width, height)
+
                 drawer.defaults()
                 drawer.stroke = ColorRGBa.WHITE
                 drawer.lineJoin = LineJoin.ROUND
