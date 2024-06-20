@@ -39,8 +39,7 @@ fun main() = application {
                 // wavy effect
                 // bri *= (1.0 + 0.2 * sin(distance * 0.2));
                 
-                x_fill.rgb = bri * (x_fill.r > 0 ? 
-                    vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 1.0));
+                x_fill.rgb = bri * (x_fill.g > 0.5 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 1.0));
             """
         }
         val mouseTracker = MouseTracker(mouse)
